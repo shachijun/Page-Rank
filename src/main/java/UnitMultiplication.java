@@ -24,7 +24,7 @@ public class UnitMultiplication {
             //target: build transition matrix unit -> fromPage\t toPage=probability
             String[] fromeTos = value.toString().trim().split("\t");
             if (fromeTos.length < 2) {
-                return;//面试的时候不要直接return
+                return;//面试的时候不要直接return, 写log
             }
             String[] tos = fromeTos[1].split(",");
             String outputKey = fromeTos[0];
@@ -50,8 +50,6 @@ public class UnitMultiplication {
     }
 
     public static class MultiplicationReducer extends Reducer<Text, Text, Text, Text> {
-
-
         @Override
         public void reduce(Text key, Iterable<Text> values, Context context)
                 throws IOException, InterruptedException {

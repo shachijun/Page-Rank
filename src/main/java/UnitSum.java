@@ -19,6 +19,8 @@ public class UnitSum {
 
             //input format: toPage\t unitMultiplication
             //target: pass to reducer
+            String[] toIdSubpr = value.toString().trim().split("\t");
+            context.write(new Text(toIdSubpr[0]), new DoubleWritable(Double.parseDouble(toIdSubpr[1])));
         }
     }
 
@@ -30,6 +32,11 @@ public class UnitSum {
 
            //input key = toPage value = <unitMultiplication>
             //target: sum!
+            double res = 0.0;
+            for (DoubleWritable Subpr : values) {
+                res += Subpr.get();
+            }
+            context.write(new Text(key), new DoubleWritable(res));
         }
     }
 
