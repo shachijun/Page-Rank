@@ -22,6 +22,15 @@ public class UnitMultiplication {
 
             //input format: fromPage\t toPage1,toPage2,toPage3
             //target: build transition matrix unit -> fromPage\t toPage=probability
+            String[] fromeTos = value.toString().trim().split("\t");
+            if (fromeTos.length < 2) {
+                return;//面试的时候不要直接return
+            }
+            String[] tos = fromeTos[1].split(",");
+            String outputKey = fromeTos[0];
+            for (String to : tos) {
+                context.write(new Text(outputKey), new Text(to + "=" + (double) 1/tos.length));
+            }
         }
     }
 
@@ -32,6 +41,11 @@ public class UnitMultiplication {
 
             //input format: Page\t PageRank
             //target: write to reducer
+            String[] idPr = value.toString().trim().split("\t");
+            if (idPr.length != 2) {
+                return;
+            }
+            context.write(new Text(idPr[0]), new Text(idPr[1]));
         }
     }
 
@@ -41,9 +55,26 @@ public class UnitMultiplication {
         @Override
         public void reduce(Text key, Iterable<Text> values, Context context)
                 throws IOException, InterruptedException {
-
             //input key = fromPage value=<toPage=probability..., pageRank>
             //target: get the unit multiplication
+            double prcell = 0;
+            List<String> tranCell = new ArrayList<String>();
+            boolean flag = false;
+            for (Text value : values) {
+                if (flag || value.toString().contains("=")) {
+                    tranCell.add(value.toString());
+                } else {
+                    prcell = Double.parseDouble(value.toString());
+                    flag = true;
+                }
+            }
+            for (String transCell : tranCell) {
+                String[] transArr = transCell.split("=");
+                String toID = transArr[0];
+                double prob = Double.parseDouble(transArr[1]);
+                double subPr = prob * prcell;
+                context.write(new Text(toID),new Text(String.valueOf(subPr)));
+            }
         }
     }
 
